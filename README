@@ -1,0 +1,9 @@
+# build
+sudo docker build -t toptal/pingpong .
+# run
+sudo docker run -d -p 8080:8080 toptal/pingpong
+# then visit the following address and you should see the word 'pong':
+#     http://localhost:8080/ping
+# or, alternatively, you can run
+curl http://localhost:8080/ping
+# to print the output to terminal
