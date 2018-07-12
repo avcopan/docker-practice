@@ -1,0 +1,85 @@
+# Create an empty directory with a Dockerfile
+mkdir empty-dir
+cd empty-dir
+touch Dockerfile
+# Have a look at the files in this directory
+
+# Before building (at work), you need to specify the DNS server:
+sudo vi /etc/docker/daemon.json
+#     {
+#         "dns": ["#.#.#.#", "8.8.8.8"]
+#     }
+sudo service docker restart
+# #.#.#.# is an IPv4 address for Argonne's DNS server -- to find it, I had to
+# search "DNS" on inside.anl.gov.
+
+# Now run the build command to create a docker image.  -t tags it with a name
+docker build -t friendlyhello .
+
+# In trying to figure out how to build, I created several non-functional images.
+# To delete them I used
+docker image ls
+docker rmi --force <image-id>
+
+# Now run the app, mapping your machine's port 4000 to the container's published
+# port 80 using -p
+docker run -p 4000:80 friendlyhello
+# Recall that port 80 is what we EXPOSEd within the Dockerfile
+
+# You can see the display content by visiting
+http://localhost:4000
+# Or you can use the `curl` command to view it at the command line
+
+# Hit `CTRL+C` to quit serving the Flask app
+
+# Alternatively, we can run the app in the background, in detached mode (-d)
+docker run -d -p 4000:80 friendlyhello
+
+# To view the running containers, use
+docker container ls
+
+# Again, you can view the server output using
+curl http://localhost:4000
+
+# To stop the process, use
+docker container stop <container-id>
+
+# It should now no longer show up with `docker container ls`
+
+# Now you can upload your image to docker hub.
+# First login
+docker login
+
+# Then tag the image, which is done with the format username/repository:tag
+docker tag friendlyhello avcopan/get-started:part2
+
+# Running docker image ls should show your newly tagged image
+
+# Publish it by uploading the image to the repository
+docker push avcopan/get-started:part2
+
+# Now you can run it as follows.
+docker run -p 4000:80 avcopan/get-started:part2
+# If the image isn't locally available on your machine, Docker will pull it from
+# the repository.  No matter where `docker run` executes, it pulls your image,
+# along with Python and all the dependencies from `requirements.txt`, and runs
+# your code.  It all travels together in a package, and you don't need to
+# install anything on the host machine for Docker to run it.
+
+## Here's the full cheat sheet from the tutorial:
+docker build -t friendlyhello .  # Create image using this directory's Dockerfile
+docker run -p 4000:80 friendlyhello  # Run "friendlyname" mapping port 4000 to 80
+docker run -d -p 4000:80 friendlyhello         # Same thing, but in detached mode
+docker container ls                                # List all running containers
+docker container ls -a             # List all containers, even those not running
+docker container stop <hash>           # Gracefully stop the specified container
+docker container kill <hash>         # Force shutdown of the specified container
+docker container rm <hash>        # Remove specified container from this machine
+docker container rm $(docker container ls -a -q)         # Remove all containers
+docker image ls -a                             # List all images on this machine
+docker image rm <image id>            # Remove specified image from this machine
+docker image rm $(docker image ls -a -q)   # Remove all images from this machine
+docker login             # Log in this CLI session using your Docker credentials
+docker tag <image> username/repository:tag  # Tag <image> for upload to registry
+docker push username/repository:tag            # Upload tagged image to registry
+docker run username/repository:tag                   # Run image from a registry

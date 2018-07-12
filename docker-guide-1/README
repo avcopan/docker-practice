@@ -1,0 +1,9 @@
+docker                     # list Docker CLI commands
+docker container --help
+docker image --help
+docker --version           # version info
+docker info                # details about the installation
+docker run hello-world     # execute a Docker image
+docker image ls            # list Docker images
+docker container ls        # list running containers spawned by your images
+docker container ls --all  # list all containers spawned by your images
